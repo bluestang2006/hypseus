@@ -37,15 +37,15 @@ include(GNUInstallDirs)
 include(GetGitRevisionDescription)
 include(InstallRequiredSystemLibraries)
 include(FindPkgConfig)
-include(ExternalProject)
-include(BuildLibMPEG2)
+#include(ExternalProject)
+#include(BuildLibMPEG2)
 
 use_cxx11( )
 
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2_TTF REQUIRED SDL2_ttf)
 PKG_SEARCH_MODULE(SDL2_IMAGE REQUIRED SDL2_image)
-build_libmpeg2( )
+PKG_SEARCH_MODULE(MPEG2 REQUIRED libmpeg2)
 
 message(STATUS "Target: ${CMAKE_SYSTEM_NAME} ${CMAKE_TARGET_ARCHITECTURES}")
 
@@ -73,6 +73,7 @@ message(STATUS "Version: ${VER_TAG}")
 include_directories(
     ${PROJECT_BINARY_DIR} # config.h
     ${SDL2_INCLUDE_DIRS}
+	${MPEG2_INCLUDE_DIRS}
 )
 
 if( "${CMAKE_TARGET_ARCHITECTURES}" MATCHES "i386" )
@@ -98,13 +99,13 @@ add_subdirectory(timer)
 add_subdirectory(video)
 add_subdirectory(vldp)
 
-add_dependencies( vldp libmpeg2 )
-add_dependencies( ldp-out vldp )
-add_dependencies( game vldp )
-add_dependencies( sound vldp )
+#add_dependencies( vldp libmpeg2 )
+#add_dependencies( ldp-out vldp )
+#add_dependencies( game vldp )
+#add_dependencies( sound vldp )
 
 add_executable( hypseus hypseus.cpp globals.h )
-target_link_libraries( hypseus plog io timer sound video cpu game ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+target_link_libraries( hypseus plog io timer sound video cpu game ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES} )
 
 if(USB_SCOREBOARD)
     add_library(ftdi1)
@@ -134,3 +135,5 @@ set(CPACK_PACKAGE_VERSION_MINOR "${VER_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${VER_PATCH}")
 
 include(CPack)
+
+execute_process(COMMAND svn export https://github.com/mirror/daphne-emu/trunk/sound ./sound/sound)
